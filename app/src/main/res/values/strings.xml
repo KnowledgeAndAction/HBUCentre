@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">中心宝</string>
+    <string name="tab_sign">签到</string>
+    <string name="tab_admin_activity">管理活动</string>
+    <string name="tab_admin_sign">签到记录</string>
+    <string name="tab_quantify">量化</string>
+    <string name="tab_me">我的</string>
+</resources>
