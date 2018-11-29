@@ -406,8 +406,8 @@ public class LoginActivity extends AppCompatActivity {
 
                 // 登录成功
                 JSONObject data = jsonObject.getJSONObject("data");
-                SpUtil.putInt(Constant.USER_TYPE, data.getInt("type"));
-                SpUtil.putString(Constant.USER_NAME, data.getString("name"));
+                SpUtil.putInt(Constant.USER_TYPE, data.getInt("Type"));
+                SpUtil.putString(Constant.USER_NAME, data.getString("Name"));
                 SpUtil.putInt(Constant.USER_GRADE, data.getInt("GradeCode"));
                 SpUtil.putString(Constant.USER_CLASS, data.getString("ClassDescription"));
                 SpUtil.putInt(Constant.USER_GROUP, data.getInt("Group"));
