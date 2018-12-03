@@ -75,4 +75,12 @@ public class Constant {
      * 未签离活动的结束时间
      */
     public static final String SIGN_OUT_ENDTIME = "sign_out_endtime";
+    /**
+     * 手机号
+     */
+    public static final String USER_PHONE = "user_phone";
+    /**
+     * 兴趣小组
+     */
+    public static final String USER_INTERESTGROUP = "user_interestgroup";
 }

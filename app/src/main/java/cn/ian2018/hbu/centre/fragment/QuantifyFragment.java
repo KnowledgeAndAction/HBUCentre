@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import cn.ian2018.hbu.centre.activity.HistoryActivity;
+import cn.ian2018.hbu.centre.activity.WeekListActivity;
 import cn.ian2018.hbu.centre.db.MyDatabase;
 import cn.ian2018.hbu.centre.model.AnalyzeSign;
 import cn.ian2018.hbu.centre.model.HistoryActive;
@@ -50,10 +51,11 @@ public class QuantifyFragment extends BaseFragment implements SwipeRefreshLayout
     private RadarView mRadarView;
     private MyDatabase db;
     private TextView tv_des;
+    private TextView tv_rank;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_history, container, false);
+        view = inflater.inflate(R.layout.fragment_quantify, container, false);
 
         db = MyDatabase.getInstance();
 
@@ -65,21 +67,23 @@ public class QuantifyFragment extends BaseFragment implements SwipeRefreshLayout
         // 获取活动信息
         getActive();
 
-        getAllDutyTime();
+        // 获取本周值班时间
+        getDutyTimeForMe();
 
         return view;
     }
 
-    private void getAllDutyTime() {
+    // 获取本周值班时间
+    private void getDutyTimeForMe() {
         OkHttpUtils
                 .get()
-                .url(URLs.GET_ALL_DUTY_TIME)
+                .url(URLs.GET_DUTY_TIME_FOR_WEEK_BY_ACCOUNT)
                 .addParams("studentNum", SpUtil.getString(Constant.ACCOUNT, ""))
                 .build()
                 .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int id) {
-                        Logs.e("获取总时间失败:" + e.toString());
+                        Logs.e("获取值班时间失败:" + e.toString());
                         tv_des.setText("抱歉，数据出了点问题，请刷新重试");
                     }
 
@@ -88,15 +92,15 @@ public class QuantifyFragment extends BaseFragment implements SwipeRefreshLayout
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             if (jsonObject.getBoolean("sucessed")) {
-                                String time = jsonObject.getString("data");
-                                tv_des.setText("同学，你已经累计值班" + time + "，继续加油啊");
+                                String allTime = jsonObject.getString("data");
+                                tv_des.setText("本周累计值班：" + allTime + "，继续加油");
                             } else {
-                                tv_des.setText("同学，目前还没有值班记录，赶快走一波学习吧");
+                                tv_des.setText("本周还未值班，不要松懈了哦");
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            Logs.e("获取总时间失败:" + e.toString());
-                            tv_des.setText("抱歉，数据出了点问题，请刷新重试");
+                            Logs.e("获取值班时间失败:" + e.toString());
+                            tv_des.setText("抱歉，数据出了点问题");
                         }
                     }
                 });
@@ -104,18 +108,22 @@ public class QuantifyFragment extends BaseFragment implements SwipeRefreshLayout
 
     private void initData() {
         List<String> vertexText = new ArrayList<>();
-        Collections.addAll(vertexText, "毅力", "通识", "守时", "自律", "精神");
+        Collections.addAll(vertexText, "毅力", "学识", "守时", "自律", "活力");
         mRadarView.setVertexText(vertexText);
 
-        // 获取日常签到次数
-        int dailyFrequency = db.getDailyFrequency(SpUtil.getString(Constant.ACCOUNT, ""));
-        // 获取讲座签到次数
+        // 获取晨读签到次数(毅力)
+        int morningFrequency = db.getMorningFrequency(SpUtil.getString(Constant.ACCOUNT, ""));
+        // 获取活动和培训的签到次数(学识)
         int lectureFrequency = db.getLectureFrequency(SpUtil.getString(Constant.ACCOUNT, ""));
-        // 获取准时签到的次数
+        // 获取准时签到的次数(守时)
         int earlyFrequency = db.getEarlyFrequency(SpUtil.getString(Constant.ACCOUNT, ""));
+        // 获取值班的签到次数(自律)
+        int onDutyFrequency = db.getOnDutyFrequency(SpUtil.getString(Constant.ACCOUNT, ""));
+        // 获取跑操签到次数(活力)
+        int runningFrequency = db.getRunningFrequency(SpUtil.getString(Constant.ACCOUNT, ""));
 
         List<Float> values = new ArrayList<>();
-        Collections.addAll(values, (float) dailyFrequency, (float) lectureFrequency, (float) earlyFrequency, 7f, 5f);
+        Collections.addAll(values, (float) morningFrequency, (float) lectureFrequency, (float) earlyFrequency, (float)onDutyFrequency, (float)runningFrequency);
         RadarData data = new RadarData(values);
 
         mRadarView.addData(data);
@@ -212,6 +220,7 @@ public class QuantifyFragment extends BaseFragment implements SwipeRefreshLayout
         mSwipeLayout.setOnRefreshListener(this);
 
         tv_des = (TextView) view.findViewById(R.id.tv_des);
+        tv_rank = (TextView) view.findViewById(R.id.tv_rank);
 
         mRadarView = (RadarView) view.findViewById(R.id.radarView);
         mRadarView.setEmptyHint("暂无数据");
@@ -221,18 +230,32 @@ public class QuantifyFragment extends BaseFragment implements SwipeRefreshLayout
         Collections.addAll(layerColor, 0x3300bcd4, 0x3303a9f4, 0x335677fc, 0x333f51b5, 0x33673ab7);
         mRadarView.setLayerColor(layerColor);
 
+        // 设置查看详细签到数据点击事件
         TextView tv_detail = (TextView) view.findViewById(R.id.tv_detail);
         tv_detail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // 跳转到签到历史记录界面
                 startActivity(new Intent(getContext(), HistoryActivity.class));
             }
         });
+
+        // 设置查看个人量化点击事件
         TextView tv_quantify = (TextView) view.findViewById(R.id.tv_quantify);
         tv_quantify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ToastUtil.show("努力开发中，敬请期待");
+            }
+        });
 
+        // 设置查看排名点击事件
+        tv_rank.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(),WeekListActivity.class);
+                intent.putExtra("groupCode",SpUtil.getInt(Constant.USER_GROUP,0));
+                startActivity(intent);
             }
         });
     }
@@ -241,6 +264,6 @@ public class QuantifyFragment extends BaseFragment implements SwipeRefreshLayout
     public void onRefresh() {
         getActive();
 
-        getAllDutyTime();
+        getDutyTimeForMe();
     }
 }

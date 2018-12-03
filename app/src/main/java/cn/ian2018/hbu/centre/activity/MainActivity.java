@@ -1,19 +1,20 @@
 package cn.ian2018.hbu.centre.activity;
 
 import android.app.ProgressDialog;
-import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,7 +23,6 @@ import android.view.KeyEvent;
 import com.hicc.information.sensorsignin.R;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
-import com.sensoro.cloud.SensoroManager;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.FileCallBack;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -42,8 +42,8 @@ import java.util.TimerTask;
 
 import cn.ian2018.hbu.centre.db.MyDatabase;
 import cn.ian2018.hbu.centre.fragment.ActivityFragment;
-import cn.ian2018.hbu.centre.fragment.QuantifyFragment;
 import cn.ian2018.hbu.centre.fragment.MeFragment;
+import cn.ian2018.hbu.centre.fragment.QuantifyFragment;
 import cn.ian2018.hbu.centre.model.Active;
 import cn.ian2018.hbu.centre.model.ExitEvent;
 import cn.ian2018.hbu.centre.model.Saying;
@@ -56,7 +56,6 @@ import cn.ian2018.hbu.centre.utils.SpUtil;
 import cn.ian2018.hbu.centre.utils.StatusBarUtils;
 import cn.ian2018.hbu.centre.utils.ToastUtil;
 import cn.ian2018.hbu.centre.utils.URLs;
-import cn.ian2018.hbu.centre.utils.Utils;
 import okhttp3.Call;
 
 /**
@@ -64,7 +63,6 @@ import okhttp3.Call;
  */
 public class MainActivity extends AppCompatActivity {
 
-    private SensoroManager sensoroManager;
     private ViewPager viewPager;
     private ArrayList<TabItem> tabs;
     private static Boolean isExit = false;
@@ -78,13 +76,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        sensoroManager = SensoroManager.getInstance(MainActivity.this);
-
         // 初始化控件
         initWidget();
-
-        // 检查蓝牙是否可用
-        checkBluetooth();
 
         // 注册监听退出登录的事件
         EventBus.getDefault().register(this);
@@ -270,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
     protected void showUpDataDialog(String description, final String appUrl) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         // 设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo2);
+        builder.setIcon(R.mipmap.ic_launcher);
         // 设置不能取消
         builder.setCancelable(false);
         // 设置对话框标题
@@ -304,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
                 .get()
                 .url(appUrl)
                 .build()
-                .execute(new FileCallBack(getExternalFilesDir("apk").getPath(),"小蜜蜂.apk") {
+                .execute(new FileCallBack(getExternalFilesDir("apk").getPath(),"中心宝.apk") {
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         ToastUtil.show("下载失败："+e.toString());
@@ -332,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
     // 下载的进度条对话框
     protected void showProgressDialog() {
         progressDialog = new ProgressDialog(this);
-        progressDialog.setIcon(R.mipmap.logo2);
+        progressDialog.setIcon(R.mipmap.ic_launcher);
         progressDialog.setTitle("下载安装包中");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -348,10 +341,20 @@ public class MainActivity extends AppCompatActivity {
     // 安装应用
     protected void installApk(File file) {
         Intent intent = new Intent("android.intent.action.VIEW");
-        intent.addCategory("android.intent.category.DEFAULT");
-        //文件作为数据源
-        intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        // 判读版本是否在7.0以上
+        if (Build.VERSION.SDK_INT >= 24) {
+            // 参数1 上下文, 参数2 Provider主机地址 和配置文件中保持一致   参数3  共享的文件
+            Uri apkUri = FileProvider.getUriForFile(this, "cn.ian2018.hbu.centre.fileprovider", file);
+            // 添加这一句表示对目标应用临时授权该Uri所代表的文件
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+        } else {
+            intent.addCategory("android.intent.category.DEFAULT");
+            intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+        }
+
         startActivityForResult(intent,1);
         android.os.Process.killProcess(android.os.Process.myPid());
     }
@@ -371,19 +374,6 @@ public class MainActivity extends AppCompatActivity {
         return 0;
     }
 
-    // 检查蓝牙是否可用
-    private void checkBluetooth() {
-        if (!sensoroManager.isBluetoothEnabled()) {
-            Intent bluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(bluetoothIntent, 0);
-        } else {
-            // 如果服务没有运行，开启服务
-            if (!Utils.ServiceIsWorked(SensorService.class.getName())) {
-                startService(new Intent(this, SensorService.class));
-            }
-        }
-    }
-
     // 初始化控件
     private void initWidget() {
         viewPager = (ViewPager) findViewById(R.id.viewPager_top);
@@ -401,15 +391,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case 0:
-                // 蓝牙可用
-                if (sensoroManager.isBluetoothEnabled()) {
-                    // 如果服务没有运行，开启服务
-                    if (!Utils.ServiceIsWorked(SensorService.class.getName())) {
-                        startService(new Intent(this, SensorService.class));
-                    }
-                }
-                break;
             case 1:
                 checkVersionCode();
         }
@@ -418,9 +399,9 @@ public class MainActivity extends AppCompatActivity {
     // 初始化布局
     private void initLayout() {
         tabs = new ArrayList<>();
-        tabs.add(new TabItem(R.drawable.bottom_activity_selector, R.string.tab_sign, ActivityFragment.class));
-        tabs.add(new TabItem(R.drawable.bottom_history_selector, R.string.tab_quantify, QuantifyFragment.class));
-        tabs.add(new TabItem(R.drawable.bottom_setting_selector, R.string.tab_me, MeFragment.class));
+        tabs.add(new TabItem(R.drawable.ic_assignment_turned_in, R.string.tab_sign, ActivityFragment.class));
+        tabs.add(new TabItem(R.drawable.ic_assignment, R.string.tab_quantify, QuantifyFragment.class));
+        tabs.add(new TabItem(R.drawable.ic_assignment_ind, R.string.tab_me, MeFragment.class));
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {

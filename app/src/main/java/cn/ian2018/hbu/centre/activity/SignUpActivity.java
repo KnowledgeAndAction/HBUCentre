@@ -85,6 +85,8 @@ public class SignUpActivity extends AppCompatActivity {
                 .addParams("name",name)
                 .addParams("grade",grade)
                 .addParams("class",clas)
+                .addParams("groupCode","0")
+                .addParams("Phone","")
                 .build()
                 .execute(new StringCallback() {
                     @Override

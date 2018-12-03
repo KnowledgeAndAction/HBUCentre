@@ -1,10 +1,13 @@
 package cn.ian2018.hbu.centre.service;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.hicc.information.sensorsignin.R;
 import com.sensoro.beacon.kit.Beacon;
 import com.sensoro.beacon.kit.BeaconManagerListener;
 import com.sensoro.cloud.SensoroManager;
@@ -38,6 +41,21 @@ public class SensorService extends Service {
         super.onCreate();
         isOpen = true;
         Logs.d("onCreate服务创建");
+
+        // 绑定前台服务
+        //Intent notificationIntent = new Intent(this,MainActivity.class);
+        //PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,notificationIntent, 0);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("中心宝")
+                .setContentText("中心宝正在运行中，请勿关闭");
+                //.setContentIntent(pendingIntent);
+        Notification notification = builder.build();
+        //设置 Notification 的 flags = FLAG_NO_CLEAR
+        //FLAG_ONGOING_EVENT 表示该通知通知放置在正在运行,不能被手动清除,但能通过 cancel() 方法清除
+        //等价于 builder.setOngoing(true);
+        notification.flags |= Notification.FLAG_FOREGROUND_SERVICE;
+        startForeground(1, notification);
     }
 
     @Override

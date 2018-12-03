@@ -98,6 +98,7 @@
                 android:hint="年级"
                 android:inputType="number"
                 android:maxLines="1"
+                android:text="17"
                 android:textSize="14sp" />
         </android.support.design.widget.TextInputLayout>
 

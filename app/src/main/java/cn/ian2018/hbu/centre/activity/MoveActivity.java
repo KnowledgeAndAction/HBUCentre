@@ -13,6 +13,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.hicc.information.sensorsignin.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -43,7 +47,6 @@ import okhttp3.Call;
 public class MoveActivity extends AppCompatActivity {
 
     private TextView tv_inTime;
-    private String inTime;
 
     private String activeName;
     private MyBroadcast myBroadcast;
@@ -63,11 +66,16 @@ public class MoveActivity extends AppCompatActivity {
     private String endTime;
     private SignItem signItem;
     private boolean autoSignOut = false;
+    private boolean isScan = false;
+    private String outLocation = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_move);
+
+        // 获取位置
+        initLocation();
 
         // 获取数据库
         database = MyDatabase.getInstance();
@@ -88,6 +96,44 @@ public class MoveActivity extends AppCompatActivity {
 
         // 检测是否已经到了结束时间
         checkSignOut();
+    }
+
+    // 配置百度定位
+    private void initLocation() {
+        // 声明LocationClient类
+        LocationClient mLocationClient = new LocationClient(getApplicationContext());
+        // 注册监听函数
+        mLocationClient.registerLocationListener(new BDAbstractLocationListener() {
+            @Override
+            public void onReceiveLocation(BDLocation bdLocation) {
+                String addr = bdLocation.getAddrStr();    //获取详细地址信息
+                String locationDescribe = bdLocation.getLocationDescribe();    //获取位置描述信息
+
+                outLocation = addr + locationDescribe;
+            }
+        });
+
+        // 配置定位信息
+        LocationClientOption option = new LocationClientOption();
+        //设置定位模式，默认高精度
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+        //设置返回经纬度坐标类型，默认gcj02  bd09ll：百度经纬度坐标；
+        option.setCoorType("bd09ll");
+        //设置发起定位请求的间隔，int类型，单位ms
+        option.setScanSpan(60*1000*60);
+        //设置是否使用gps，默认false
+        option.setOpenGps(true);
+        //设置是否在stop的时候杀死这个进程，默认（建议）不杀死，即setIgnoreKillProcess(true)
+        option.setIgnoreKillProcess(false);
+        //是否需要地址信息，默认为不需要，即参数为false
+        option.setIsNeedAddress(true);
+        //是否需要位置描述信息，默认为不需要，即参数为false
+        option.setIsNeedLocationDescribe(true);
+        //需将配置好的LocationClientOption对象，通过setLocOption方法传递给LocationClient对象使用
+        mLocationClient.setLocOption(option);
+
+        // 开始定位
+        mLocationClient.start();
     }
 
     // 检测是否已经到了结束时间
@@ -156,6 +202,7 @@ public class MoveActivity extends AppCompatActivity {
             location = active.getActiveLocation();
             activeId = active.getActiveId();
             endTime = active.getEndTime();
+            isScan = active.isScan();
 
             SpUtil.putString("yunziId", yunziId);
             SpUtil.putString("endTime", endTime);
@@ -236,7 +283,8 @@ public class MoveActivity extends AppCompatActivity {
     private void signOut() {
         getOutTime();
         // TODO 如果可以签离 为了优化用户体验，当连续点击15次，可以签到
-        if (isCan || clickCount > 14) {
+        // 如果是通过扫描获取的活动 可以直接签离
+        if (isCan || clickCount > 14 || isScan) {
             isClick = true;
             // 发送时间数据
             signForService();
@@ -255,6 +303,7 @@ public class MoveActivity extends AppCompatActivity {
                 .url(URLs.SIGN_OUT)
                 .addParams("nid", mNid+"")
                 .addParams("outtime", outTime)
+                .addParams("OutLocation", outLocation)
                 .build()
                 .execute(new StringCallback() {
                     @Override
@@ -363,7 +412,7 @@ public class MoveActivity extends AppCompatActivity {
     private void showSignOutConfirmDialog() {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         //设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo2);
+        builder.setIcon(R.mipmap.ic_launcher);
         //设置对话框标题
         builder.setTitle("确定要签离");
         //设置文本内容

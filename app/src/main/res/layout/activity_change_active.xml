@@ -142,36 +142,6 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:text="活动类型"
-                android:textColor="#545151"
-                android:textSize="16sp" />
-
-            <RadioGroup
-                android:id="@+id/rg_rule"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <RadioButton
-                    android:id="@+id/rb_active"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:text="日常活动" />
-
-                <RadioButton
-                    android:id="@+id/rb_duty"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="30dp"
-                    android:text="普通活动" />
-            </RadioGroup>
-
             <Button
                 android:id="@+id/bt_submit"
                 android:layout_width="match_parent"

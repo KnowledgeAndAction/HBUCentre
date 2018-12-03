@@ -19,99 +19,144 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
     </android.support.design.widget.AppBarLayout>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="8dp">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:text="选择组别"
-            android:textColor="#545151"
-            android:textSize="16sp" />
-
-        <Button
-            android:id="@+id/bt_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/buttonColor"
-            android:padding="20dp"
-            android:text="选择组别"
-            android:textAllCaps="false"
-            android:textColor="#ffffff"
-            android:textSize="14sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:text="选择星期"
-            android:textColor="#545151"
-            android:textSize="16sp" />
-
-        <Button
-            android:id="@+id/bt_week"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/buttonColor"
-            android:padding="20dp"
-            android:text="选择星期"
-            android:textColor="#ffffff"
-            android:textSize="14sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:text="选择时间"
-            android:textColor="#545151"
-            android:textSize="16sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:text="选择组别"
+                android:textColor="#545151"
+                android:textSize="16sp" />
 
             <Button
-                android:id="@+id/bt_date"
-                android:layout_width="0dp"
+                android:visibility="gone"
+                android:id="@+id/bt_group"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:backgroundTint="@color/buttonColor"
                 android:padding="20dp"
-                android:text="选择日期"
+                android:text="选择组别"
+                android:textAllCaps="false"
                 android:textColor="#ffffff"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:text="选择补班星期"
+                android:textColor="#545151"
+                android:textSize="16sp" />
 
             <Button
-                android:id="@+id/bt_time"
-                android:layout_width="0dp"
+                android:id="@+id/bt_week"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:backgroundTint="@color/buttonColor"
                 android:padding="20dp"
-                android:text="选择节次"
+                android:text="选择补班星期"
                 android:textColor="#ffffff"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:text="选择补班时间"
+                android:textColor="#545151"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/bt_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/buttonColor"
+                    android:padding="20dp"
+                    android:text="选择日期"
+                    android:textColor="#ffffff"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/bt_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/buttonColor"
+                    android:padding="20dp"
+                    android:text="选择节次"
+                    android:textColor="#ffffff"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:text="选择请假时间"
+                android:textColor="#545151"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/bt_leave_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/buttonColor"
+                    android:padding="20dp"
+                    android:text="选择日期"
+                    android:textColor="#ffffff"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/bt_leave_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/buttonColor"
+                    android:padding="20dp"
+                    android:text="选择节次"
+                    android:textColor="#ffffff"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/bt_submit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/button_bg"
+                android:text="添加补班"
+                android:textColor="#ffffff"
+                android:textSize="16sp" />
+
         </LinearLayout>
-
-        <Button
-            android:id="@+id/bt_submit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="40dp"
-            android:background="@drawable/button_bg"
-            android:text="添加补班"
-            android:textColor="#ffffff"
-            android:textSize="16sp" />
-
-    </LinearLayout>
+    </ScrollView>
 </LinearLayout>

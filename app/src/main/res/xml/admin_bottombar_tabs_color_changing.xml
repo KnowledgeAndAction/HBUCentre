@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <tabs>
     <tab
-        id="@+id/tab_active"
-        icon="@drawable/bottom_activity_selector"
-        title="管理活动"
+        id="@+id/tab_home"
+        icon="@drawable/ic_account_balance"
+        title="首页"
         barColorWhenSelected="#03A9F4" />
     <tab
-        id="@+id/tab_sign"
-        icon="@drawable/bottom_history_selector"
-        title="签到记录"
-        barColorWhenSelected="#5D4037" />
-    <tab
-        id="@+id/tab_setting"
-        icon="@drawable/bottom_setting_selector"
-        title="设置"
+        id="@+id/tab_me"
+        icon="@drawable/ic_account_box"
+        title="我的"
         barColorWhenSelected="#045563" />
 </tabs>

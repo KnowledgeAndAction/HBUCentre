@@ -1,11 +1,14 @@
 package cn.ian2018.hbu.centre.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.hicc.information.sensorsignin.R;
@@ -20,7 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.ian2018.hbu.centre.adapter.SignInfoAdapter;
+import cn.ian2018.hbu.centre.model.Active;
 import cn.ian2018.hbu.centre.model.SignInfo;
+import cn.ian2018.hbu.centre.utils.Logs;
 import cn.ian2018.hbu.centre.utils.ToastUtil;
 import cn.ian2018.hbu.centre.utils.URLs;
 import okhttp3.Call;
@@ -36,6 +41,7 @@ public class SignRecordActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipe_refresh;
     private SignInfoAdapter myAdapter;
+    private Active active;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +49,9 @@ public class SignRecordActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_record);
 
         // 从上一个界面接收这个活动的id
-        activeId = getIntent().getLongExtra("id", 0);
+        active = (Active) getIntent().getSerializableExtra("active");
+        activeId = active.getActiveId();
+        Logs.d("活动ID："+activeId);
 
         initView();
     }
@@ -81,19 +89,20 @@ public class SignRecordActivity extends AppCompatActivity {
                     String in = object.getString("inTime");
                     String out = object.getString("outTime");
                     String name = object.getString("name");
-                    if (!in.equals(out)) {
-                        SignInfo signInfo = new SignInfo();
-                        signInfo.setInTime(in);
-                        signInfo.setOutTime(out);
-                        signInfo.setName(name);
-                        signInfoList.add(signInfo);
-                    }
+                    int group = object.getInt("groupCode");
+
+                    SignInfo signInfo = new SignInfo();
+                    signInfo.setInTime(in);
+                    signInfo.setOutTime(out);
+                    signInfo.setName(name);
+                    signInfo.setGroupCode(group);
+                    signInfoList.add(signInfo);
                 }
                 swipe_refresh.setRefreshing(false);
                 myAdapter.notifyDataSetChanged();
             } else {
                 swipe_refresh.setRefreshing(false);
-                ToastUtil.show("加载数据失败:" +jsonObject.getString("msg"));
+                ToastUtil.show("暂无签到记录");
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -104,13 +113,29 @@ public class SignRecordActivity extends AppCompatActivity {
 
     private void initView() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("签到记录");
+        toolbar.setTitle(active.getActiveName()+"签到记录");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
+            }
+        });
+        // 添加菜单点击事件
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_add:
+                        // 跳转到修改活动界面
+                        Intent intent = new Intent(SignRecordActivity.this,ChangeActiveActivity.class);
+                        // 把活动传过去
+                        intent.putExtra("active",active);
+                        startActivity(intent);
+                        break;
+                }
+                return true;
             }
         });
 
@@ -135,5 +160,12 @@ public class SignRecordActivity extends AppCompatActivity {
         // 设置开始就刷新
         swipe_refresh.setRefreshing(true);
         initData();
+    }
+
+    // 显示菜单
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_admin_change_active, menu);
+        return true;
     }
 }

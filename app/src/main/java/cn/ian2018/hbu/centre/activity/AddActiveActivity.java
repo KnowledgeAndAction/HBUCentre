@@ -4,14 +4,12 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RadioGroup;
 
 import com.hicc.information.sensorsignin.R;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
@@ -29,6 +27,7 @@ import cn.ian2018.hbu.centre.utils.Constant;
 import cn.ian2018.hbu.centre.utils.SpUtil;
 import cn.ian2018.hbu.centre.utils.ToastUtil;
 import cn.ian2018.hbu.centre.utils.URLs;
+import cn.ian2018.hbu.centre.utils.Utils;
 import okhttp3.Call;
 
 /**
@@ -50,13 +49,11 @@ public class AddActiveActivity extends AppCompatActivity {
     private Button bt_active_date;
     private Button bt_active_time;
     private Button bt_submit;
-    private RadioGroup rg_rule;
     private ProgressDialog progressDialog;
     private String mTime = "";
     private String mEndTime = "";
     private String mDate = "";
     private String mEndDate = "";
-    private int mRule = -1;
     private Toolbar toolbar;
     private Button bt_active_end_time;
     private Button bt_active_end_date;
@@ -179,28 +176,13 @@ public class AddActiveActivity extends AppCompatActivity {
 
                 // 如果都不为空，提交活动
                 if (!activeName.equals("") && !activeDes.equals("") && !activeLocation.equals("")
-                        && !yunziId.equals("") && !mDate.equals("") && !mTime.equals("") && mRule != -1
+                        && !yunziId.equals("") && !mDate.equals("") && !mTime.equals("")
                         && !mEndDate.equals("") && !mEndTime.equals("")) {
                     String dateTime = mDate + " " + mTime;
                     String endDateTime = mEndDate + " " + mEndTime;
                     showConfirmDialog(activeName, activeDes, activeLocation, yunziId, dateTime,endDateTime);
                 } else {
                     ToastUtil.show("请将活动信息填写完整");
-                }
-            }
-        });
-
-        // RadioGroup点击监听事件
-        rg_rule.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
-                switch (checkedId) {
-                    case R.id.rb_active:
-                        mRule = TYPE_RUN;
-                        break;
-                    case R.id.rb_duty:
-                        mRule = TYPE_ORDINARY;
-                        break;
                 }
             }
         });
@@ -213,7 +195,7 @@ public class AddActiveActivity extends AppCompatActivity {
     protected void showConfirmDialog(final String activeName, final String activeDes, final String activeLocation, final String yunziId, final String dateTime, final String endDateTime) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         // 设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo2);
+        builder.setIcon(R.mipmap.ic_launcher);
         // 设置不能取消
         builder.setCancelable(false);
         // 设置对话框标题
@@ -226,7 +208,7 @@ public class AddActiveActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 // 提交活动
                 showProgressDialog();
-                submitService(activeName, activeDes, activeLocation, yunziId, dateTime,endDateTime,mRule);
+                submitService(activeName, activeDes, activeLocation, yunziId, dateTime,endDateTime);
                 dialog.dismiss();
             }
         });
@@ -242,7 +224,7 @@ public class AddActiveActivity extends AppCompatActivity {
     }
 
     // 提交活动信息到数据库
-    private void submitService(String activeName, String activeDes, String activeLocation, String yunziId, String dateTime, String endDateTime, int mRule) {
+    private void submitService(String activeName, String activeDes, String activeLocation, String yunziId, String dateTime, String endDateTime) {
         // GET方法提交
         OkHttpUtils
                 .get()
@@ -253,8 +235,8 @@ public class AddActiveActivity extends AppCompatActivity {
                 .addParams("time", dateTime)
                 .addParams("endtime", endDateTime)
                 .addParams("location", activeLocation)
-                .addParams("rule", ""+mRule)
-                .addParams("account", SpUtil.getString(Constant.ACCOUNT,""))
+                .addParams("rule", ""+Utils.getRuleForUser())
+                .addParams("account", Utils.getAccount()+"")
                 .build()
                 .execute(new StringCallback() {
                     @Override
@@ -299,10 +281,27 @@ public class AddActiveActivity extends AppCompatActivity {
         }
     }
 
+    private String getToolbarTitle(){
+        String title = "";
+        int type = SpUtil.getInt(Constant.USER_TYPE, 0);
+        switch (type) {
+            case 1:
+            case 2:
+                title = "添加活动";
+                break;
+            case 3:
+            case 4:
+                title = "添加培训";
+                break;
+        }
+
+        return title;
+    }
+
     // 初始化控件
     private void initView() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("添加活动");
+        toolbar.setTitle(getToolbarTitle());
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -322,8 +321,6 @@ public class AddActiveActivity extends AppCompatActivity {
         bt_active_end_date = (Button) findViewById(R.id.bt_active_end_date);
         bt_active_end_time = (Button) findViewById(R.id.bt_active_end_time);
         bt_submit = (Button) findViewById(R.id.bt_submit);
-
-        rg_rule = (RadioGroup) findViewById(R.id.rg_rule);
 
         ImageView iv_scan = (ImageView) findViewById(R.id.iv_scan);
         iv_scan.setOnClickListener(new View.OnClickListener() {

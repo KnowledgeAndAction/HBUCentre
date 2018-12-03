@@ -7,52 +7,34 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:orientation="horizontal"
+        android:padding="20dp">
 
         <TextView
-            android:id="@+id/tv_account"
-            android:layout_width="wrap_content"
+            android:id="@+id/tv_name"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="10dp"
-            android:text="账号"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/tv_msg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="10dp"
-            android:text="意见反馈信息，意见反馈信息"
+            android:layout_weight="1"
+            android:text="姓名"
             android:textSize="18sp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_group"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="组别"
+            android:textSize="18sp" />
 
-            <TextView
-                android:id="@+id/tv_phone"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_weight="1"
-                android:text="手机型号"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_version"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="16dp"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:text="android版本"
-                android:textSize="12sp" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tv_anonymous"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="匿名"
+            android:textSize="18sp" />
 
     </LinearLayout>
 </android.support.v7.widget.CardView>

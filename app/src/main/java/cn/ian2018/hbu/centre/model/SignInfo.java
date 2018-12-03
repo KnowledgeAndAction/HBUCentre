@@ -8,6 +8,24 @@ public class SignInfo {
     private String name;
     private String inTime;
     private String outTime;
+    private int groupCode;
+    private int backTo;
+
+    public int getGroupCode() {
+        return groupCode;
+    }
+
+    public void setGroupCode(int groupCode) {
+        this.groupCode = groupCode;
+    }
+
+    public int getBackTo() {
+        return backTo;
+    }
+
+    public void setBackTo(int backTo) {
+        this.backTo = backTo;
+    }
 
     public String getName() {
         return name;

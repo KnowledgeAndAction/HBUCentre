@@ -7,8 +7,8 @@ import android.util.Log;
  */
 
 public class Logs {
-    private static String TAG = "智慧校园TAG：";
-    private static int IS_OPEN = 1;
+    private static String TAG = "中心宝TAG：";
+    private static int IS_OPEN = 52;
 
     public static void d(String msg) {
         if (IS_OPEN > 0) {

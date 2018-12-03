@@ -68,16 +68,6 @@ public class SplashActivity extends AppCompatActivity {
 
     // 进入应用
     private void enterHome() {
-        /*boolean is_first_enter = SpUtil.getBoolean("is_first_enter", true);
-        if(is_first_enter){
-            Intent intent = new Intent(this, GuideActivity.class);
-            startActivity(intent);
-            finish();
-        }else {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-            finish();
-        }*/
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();

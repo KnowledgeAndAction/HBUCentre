@@ -43,6 +43,13 @@ public class AddBackDutyActivity extends AppCompatActivity implements View.OnCli
     private int index_group = 0;
     private int index_week = 0;
     private int index_time = 0;
+    private Button bt_leave_date;
+    private Button bt_leave_time;
+    private String BackActiveID = "";
+    private String LeaveTime = "";
+    private String LeaveActiveID = "";
+    private final int BACK = 0;
+    private final int LEAVE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +75,16 @@ public class AddBackDutyActivity extends AppCompatActivity implements View.OnCli
         bt_week = (Button) findViewById(R.id.bt_week);
         bt_time = (Button) findViewById(R.id.bt_time);
         bt_date = (Button) findViewById(R.id.bt_date);
+        bt_leave_date = (Button) findViewById(R.id.bt_leave_date);
+        bt_leave_time = (Button) findViewById(R.id.bt_leave_time);
         Button bt_submit = (Button) findViewById(R.id.bt_submit);
 
         bt_group.setOnClickListener(this);
         bt_week.setOnClickListener(this);
         bt_time.setOnClickListener(this);
         bt_date.setOnClickListener(this);
+        bt_leave_date.setOnClickListener(this);
+        bt_leave_time.setOnClickListener(this);
         bt_submit.setOnClickListener(this);
     }
 
@@ -87,15 +98,22 @@ public class AddBackDutyActivity extends AppCompatActivity implements View.OnCli
                 showSwitchWeekDialog();
                 break;
             case R.id.bt_time:
-                showSwitchTimeDialog();
+                showSwitchTimeDialog(BACK);
                 break;
             case R.id.bt_date:
-                showSwitchDate();
+                showSwitchDate(BACK);
+                break;
+            case R.id.bt_leave_time:
+                showSwitchTimeDialog(LEAVE);
+                break;
+            case R.id.bt_leave_date:
+                showSwitchDate(LEAVE);
                 break;
             case R.id.bt_submit:
-                if (!account.equals("") && week!=0 && !activityName.equals("") && !date.equals("")) {
+                if (week!=0 && !activityName.equals("") && !date.equals("") && !LeaveActiveID.equals("") && !LeaveTime.equals("")) {
                     showConfirmDialog();
                 } else {
+                    Logs.d("account:"+account+",week:"+week+",activityName:"+activityName+",date:"+date+",LeaveActiveID:"+LeaveActiveID +",LeaveTime:"+LeaveTime);
                     ToastUtil.show("请将信息填写完整");
                 }
                 break;
@@ -105,40 +123,19 @@ public class AddBackDutyActivity extends AppCompatActivity implements View.OnCli
     // 选择组别
     public void showSwitchGroupDialog(){
         final String[] items = {"Android组","iOS组","Java组","PHP组","前端组","视频组",".NET组"};
+        final String[] groups = {"android","ios","java","php","qianduan","shipin",".net"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("选择组别");
         builder.setSingleChoiceItems(items, index_group, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 index_group = which;
-                switch (which) {
-                    case 0:
-                        account = "android";
-                        break;
-                    case 1:
-                        account = "ios";
-                        break;
-                    case 2:
-                        account = "java";
-                        break;
-                    case 3:
-                        account = "php";
-                        break;
-                    case 4:
-                        account = "qianduan";
-                        break;
-                    case 5:
-                        account = "shipin";
-                        break;
-                    case 6:
-                        account = ".net";
-                        break;
-                }
             }
         });
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                account = groups[index_group];
                 bt_group.setText(items[index_group]);
                 dialog.dismiss();
             }
@@ -155,40 +152,19 @@ public class AddBackDutyActivity extends AppCompatActivity implements View.OnCli
     // 选择星期
     public void showSwitchWeekDialog(){
         final String[] items = {"星期一","星期二","星期三","星期四","星期五","星期六","星期日"};
+        final int[] weeks = {2,3,4,5,6,7,1};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("选择星期");
         builder.setSingleChoiceItems(items, index_week, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 index_week = which;
-                switch (which) {
-                    case 0:
-                        week = 2;
-                        break;
-                    case 1:
-                        week = 3;
-                        break;
-                    case 2:
-                        week = 4;
-                        break;
-                    case 3:
-                        week = 5;
-                        break;
-                    case 4:
-                        week = 6;
-                        break;
-                    case 5:
-                        week = 7;
-                        break;
-                    case 6:
-                        week = 1;
-                        break;
-                }
             }
         });
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                week = weeks[index_week];
                 bt_week.setText(items[index_week]);
                 dialog.dismiss();
             }
@@ -202,45 +178,37 @@ public class AddBackDutyActivity extends AppCompatActivity implements View.OnCli
         builder.show();
     }
 
-    // 选择时间
-    public void showSwitchTimeDialog(){
+    // 选择节次
+    public void showSwitchTimeDialog(final int type){
         final String[] items = {"第一大节(08:00-09:40)","第二大节(10:10-11:50)",
                 "第三大节(14:30-16:10)","第四大节(16:20-18:00)","第五大节(19:00-21:35)"};
+        final String[] times = {"08:00","10:10","14:30","16:20","19:00"};
+        final String[] endTimes = {"09:40","11:50","16:10","18:00","21:35"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("选择时间");
+        builder.setTitle("选择节次");
         builder.setSingleChoiceItems(items, index_time, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                activityName = items[which] + "值班";
                 index_time = which;
-                switch (which) {
-                    case 0:
-                        time = "08:00";
-                        endTime = "09:40";
-                        break;
-                    case 1:
-                        time = "10:10";
-                        endTime = "11:50";
-                        break;
-                    case 2:
-                        time = "14:30";
-                        endTime = "16:10";
-                        break;
-                    case 3:
-                        time = "16:20";
-                        endTime = "18:00";
-                        break;
-                    case 4:
-                        time = "19:00";
-                        endTime = "21:35";
-                        break;
-                }
             }
         });
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                bt_time.setText(items[index_time].substring(0,4));
+                switch (type) {
+                    case BACK:
+                        activityName = items[index_time] + "补班";
+                        BackActiveID = String.valueOf(index_time+1);
+                        time = times[index_time];
+                        endTime = endTimes[index_time];
+                        bt_time.setText(items[index_time].substring(0,4));
+                        break;
+                    case LEAVE:
+                        LeaveActiveID = String.valueOf(index_time+1);
+                        bt_leave_time.setText(items[index_time].substring(0,4));
+                        break;
+                }
+
                 dialog.dismiss();
             }
         });
@@ -253,14 +221,23 @@ public class AddBackDutyActivity extends AppCompatActivity implements View.OnCli
         builder.show();
     }
 
-    public void showSwitchDate() {
+    // 选择时间
+    public void showSwitchDate(final int type) {
         Calendar now = Calendar.getInstance();
         DatePickerDialog dpd = DatePickerDialog.newInstance(
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePickerDialog datePickerDialog, int i, int i1, int i2) {
-                        date = i + "-" + (i1 + 1) + "-" + i2;
-                        bt_date.setText(date);
+                        switch (type) {
+                            case BACK:
+                                date = i + "-" + (i1 + 1) + "-" + i2;
+                                bt_date.setText(date);
+                                break;
+                            case LEAVE:
+                                LeaveTime = i + "-" + (i1 + 1) + "-" + i2;
+                                bt_leave_date.setText(LeaveTime);
+                                break;
+                        }
                     }
                 },
                 now.get(Calendar.YEAR),
@@ -276,7 +253,7 @@ public class AddBackDutyActivity extends AppCompatActivity implements View.OnCli
     public void showConfirmDialog() {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         // 设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo2);
+        builder.setIcon(R.mipmap.ic_launcher);
         // 设置不能取消
         builder.setCancelable(false);
         // 设置对话框标题
@@ -312,9 +289,12 @@ public class AddBackDutyActivity extends AppCompatActivity implements View.OnCli
                 .addParams("activityname",activityName)
                 .addParams("time",date+" "+time)
                 .addParams("endtime",date+" "+endTime)
-                .addParams("account",account)
+                .addParams("account",-1+"")
                 .addParams("week",week+"")
                 .addParams("studentNum", SpUtil.getString(Constant.ACCOUNT,""))
+                .addParams("BackActiveID", BackActiveID)
+                .addParams("LeaveTime", LeaveTime)
+                .addParams("LeaveActiveID", LeaveActiveID)
                 .build()
                 .execute(new StringCallback() {
                     @Override

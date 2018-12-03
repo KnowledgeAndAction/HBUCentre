@@ -16,6 +16,15 @@ public class Active implements Serializable {
     private long activeId;
     private int rule;
     private int backTo;
+    private boolean isScan;
+
+    public boolean isScan() {
+        return isScan;
+    }
+
+    public void setScan(boolean scan) {
+        isScan = scan;
+    }
 
     public String getEndTime() {
         return endTime;

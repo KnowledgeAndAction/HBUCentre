@@ -31,7 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="如果您遇到什么问题，可以随时联系我们，\nQQ讨论组：http://url.cn/4EyBiy9"
+        android:text="如果对中心有什么意见或建议，欢迎大家积极反馈"
         android:textSize="16sp" />
 
 
@@ -49,11 +49,21 @@
             android:maxLines="5" />
     </android.support.design.widget.TextInputLayout>
 
+    <CheckBox
+        android:id="@+id/cb_anonymous"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:gravity="center"
+        android:textColor="#595858"
+        android:text="匿名提交"
+        android:textSize="16sp" />
+
     <Button
         android:id="@+id/submit_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
+        android:layout_margin="20dp"
         android:background="@drawable/button_bg"
         android:text="提  交"
         android:textColor="#fff"

@@ -7,18 +7,18 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.hicc.information.sensorsignin.R;
 import com.roughike.bottombar.BottomBar;
@@ -38,9 +38,8 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import cn.ian2018.hbu.centre.fragment.AdminActivityFragment;
-import cn.ian2018.hbu.centre.fragment.MeFragment;
-import cn.ian2018.hbu.centre.fragment.SignRecordFragment;
+import cn.ian2018.hbu.centre.fragment.AdminHomeFragment;
+import cn.ian2018.hbu.centre.fragment.AdminMeFragment;
 import cn.ian2018.hbu.centre.model.ExitEvent;
 import cn.ian2018.hbu.centre.model.TabItem;
 import cn.ian2018.hbu.centre.service.SensorService;
@@ -63,18 +62,6 @@ public class AdminActivity extends AppCompatActivity {
     private BottomBar bottomBar;
     private Toolbar toolbar;
     private FragmentAdapter fragmentAdapter;
-    // toolbar上菜单点击事件
-    private Toolbar.OnMenuItemClickListener onMenuItemClick = new Toolbar.OnMenuItemClickListener() {
-        @Override
-        public boolean onMenuItemClick(MenuItem menuItem) {
-            switch (menuItem.getItemId()) {
-                case R.id.action_add:
-                    startActivity(new Intent(AdminActivity.this, AddActiveActivity.class));
-                    break;
-            }
-            return true;
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +84,6 @@ public class AdminActivity extends AppCompatActivity {
         OkHttpUtils
                 .get()
                 .url(URLs.UPDATE)
-                .addParams("appId", "1")
                 .build()
                 .execute(new StringCallback() {
                     @Override
@@ -149,7 +135,7 @@ public class AdminActivity extends AppCompatActivity {
     protected void showUpDataDialog(String description, final String appUrl) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         // 设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo2);
+        builder.setIcon(R.mipmap.ic_launcher);
         // 设置不能取消
         builder.setCancelable(false);
         // 设置对话框标题
@@ -183,7 +169,7 @@ public class AdminActivity extends AppCompatActivity {
                 .get()
                 .url(appUrl)
                 .build()
-                .execute(new FileCallBack(getExternalFilesDir("apk").getPath(), "小蜜蜂.apk") {
+                .execute(new FileCallBack(getExternalFilesDir("apk").getPath(), "中心宝.apk") {
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         ToastUtil.show("下载失败：" + e.toString());
@@ -211,7 +197,7 @@ public class AdminActivity extends AppCompatActivity {
     // 下载的进度条对话框
     protected void showProgressDialog() {
         progressDialog = new ProgressDialog(this);
-        progressDialog.setIcon(R.mipmap.logo2);
+        progressDialog.setIcon(R.mipmap.ic_launcher);
         progressDialog.setTitle("下载安装包中");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -227,11 +213,21 @@ public class AdminActivity extends AppCompatActivity {
     // 安装应用
     protected void installApk(File file) {
         Intent intent = new Intent("android.intent.action.VIEW");
-        intent.addCategory("android.intent.category.DEFAULT");
-        //文件作为数据源
-        intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivityForResult(intent, 1);
+
+        // 判读版本是否在7.0以上
+        if (Build.VERSION.SDK_INT >= 24) {
+            // 参数1 上下文, 参数2 Provider主机地址 和配置文件中保持一致   参数3  共享的文件
+            Uri apkUri = FileProvider.getUriForFile(this, "cn.ian2018.hbu.centre.fileprovider", file);
+            // 添加这一句表示对目标应用临时授权该Uri所代表的文件
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+        } else {
+            intent.addCategory("android.intent.category.DEFAULT");
+            intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+        }
+
+        startActivityForResult(intent,1);
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 
@@ -256,19 +252,20 @@ public class AdminActivity extends AppCompatActivity {
         bottomBar = (BottomBar) findViewById(R.id.admin_bottomBar);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("管理活动");
+        toolbar.setTitle("首页");
         toolbar.setBackgroundColor(Color.parseColor("#03A9F4"));
         setSupportActionBar(toolbar);
-        toolbar.setOnMenuItemClickListener(onMenuItemClick);
 
         initLayout();
     }
 
+    // 从安装应用界面返回
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case 1:
+                // 继续检测更新
                 checkVersionCode();
         }
     }
@@ -276,29 +273,22 @@ public class AdminActivity extends AppCompatActivity {
     // 初始化布局
     private void initLayout() {
         tabs = new ArrayList<>();
-        tabs.add(new TabItem(R.drawable.bottom_activity_selector, R.string.tab_admin_activity, AdminActivityFragment.class));
-        tabs.add(new TabItem(R.drawable.bottom_history_selector, R.string.tab_admin_sign, SignRecordFragment.class));
-        tabs.add(new TabItem(R.drawable.bottom_setting_selector, R.string.tab_me, MeFragment.class));
+        tabs.add(new TabItem(R.drawable.ic_account_balance, R.string.tab_admin_home, AdminHomeFragment.class));
+        tabs.add(new TabItem(R.drawable.ic_account_box, R.string.tab_me, AdminMeFragment.class));
         // 底部栏选择监听事件
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {
                 switch (tabId) {
-                    case R.id.tab_active:
+                    case R.id.tab_home:
                         viewPager.setCurrentItem(0);
-                        toolbar.setTitle("管理活动");
+                        toolbar.setTitle("首页");
                         toolbar.setBackgroundColor(Color.parseColor("#03A9F4"));
                         StatusBarUtils.setWindowStatusBarColor(AdminActivity.this, "#03A9F4");
                         break;
-                    case R.id.tab_sign:
-                        viewPager.setCurrentItem(1);
-                        toolbar.setTitle("签到记录");
-                        toolbar.setBackgroundColor(Color.parseColor("#5D4037"));
-                        StatusBarUtils.setWindowStatusBarColor(AdminActivity.this, "#5D4037");
-                        break;
-                    case R.id.tab_setting:
+                    case R.id.tab_me:
                         viewPager.setCurrentItem(2);
-                        toolbar.setTitle("设置");
+                        toolbar.setTitle("我的");
                         toolbar.setBackgroundColor(Color.parseColor("#045563"));
                         StatusBarUtils.setWindowStatusBarColor(AdminActivity.this, "#045563");
                         break;
@@ -320,17 +310,12 @@ public class AdminActivity extends AppCompatActivity {
                 bottomBar.selectTabAtPosition(position, true);
                 switch (position) {
                     case 0:
-                        toolbar.setTitle("管理活动");
+                        toolbar.setTitle("首页");
                         toolbar.setBackgroundColor(Color.parseColor("#03A9F4"));
                         StatusBarUtils.setWindowStatusBarColor(AdminActivity.this, "#03A9F4");
                         break;
                     case 1:
-                        toolbar.setTitle("签到记录");
-                        toolbar.setBackgroundColor(Color.parseColor("#5D4037"));
-                        StatusBarUtils.setWindowStatusBarColor(AdminActivity.this, "#5D4037");
-                        break;
-                    case 2:
-                        toolbar.setTitle("设置");
+                        toolbar.setTitle("我的");
                         toolbar.setBackgroundColor(Color.parseColor("#045563"));
                         StatusBarUtils.setWindowStatusBarColor(AdminActivity.this, "#045563");
                         break;
@@ -406,12 +391,5 @@ public class AdminActivity extends AppCompatActivity {
         } else {
             finish();
         }
-    }
-
-    // 显示菜单
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_tool_bar, menu);
-        return true;
     }
 }

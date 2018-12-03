@@ -294,10 +294,10 @@ public class MyDatabase {
         db.delete("AnalyzeSign", null, null);
     }
 
-    // 获取日常签到次数
-    public int getDailyFrequency(String num) {
+    // 获取晨读签到次数（毅力）
+    public int getMorningFrequency(String num) {
         int number = 0;
-        Cursor cursor = db.query("AnalyzeSign", null, "(rule=? or rule=?) and number=?", new String[]{"1","3",num}, null, null, null);
+        Cursor cursor = db.query("AnalyzeSign", null, "rule=? and number=?", new String[]{"5",num}, null, null, null);
 
         while (cursor.moveToNext()) {
             number++;
@@ -306,10 +306,10 @@ public class MyDatabase {
         return number;
     }
 
-    // 获取讲座签到次数
+    // 获取活动和培训的签到次数（学识）
     public int getLectureFrequency(String num) {
         int number = 0;
-        Cursor cursor = db.query("AnalyzeSign", null, "rule=? and number=?", new String[]{"0",num}, null, null, null);
+        Cursor cursor = db.query("AnalyzeSign", null, "(rule=? or rule=?) and number=?", new String[]{"1","3",num}, null, null, null);
 
         while (cursor.moveToNext()) {
             number++;
@@ -319,7 +319,33 @@ public class MyDatabase {
         return number;
     }
 
-    // 获取签到时间比开始时间早的次数
+    // 获取值班的签到次数（自律）
+    public int getOnDutyFrequency(String num) {
+        int number = 0;
+        Cursor cursor = db.query("AnalyzeSign", null, "rule=? and number=?", new String[]{"2",num}, null, null, null);
+
+        while (cursor.moveToNext()) {
+            number++;
+        }
+
+        cursor.close();
+        return number;
+    }
+
+    // 获取跑操的签到次数（活力）
+    public int getRunningFrequency(String num) {
+        int number = 0;
+        Cursor cursor = db.query("AnalyzeSign", null, "rule=? and number=?", new String[]{"4",num}, null, null, null);
+
+        while (cursor.moveToNext()) {
+            number++;
+        }
+
+        cursor.close();
+        return number;
+    }
+
+    // 获取签到时间比开始时间早的次数 （守时）
     public int getEarlyFrequency(String num) {
         SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
         int number = 0;

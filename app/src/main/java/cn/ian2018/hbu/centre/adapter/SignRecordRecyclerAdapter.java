@@ -13,7 +13,7 @@ import java.util.List;
 import cn.ian2018.hbu.centre.model.Active;
 
 /**
- * 管理员界面 活动签到RecyclerView适配器——陈帅
+ * 管理员界面 查看活动有哪些人签到RecyclerView适配器——陈帅
  */
 
 public class SignRecordRecyclerAdapter extends RecyclerView.Adapter<SignRecordRecyclerAdapter.ViewHolder> {

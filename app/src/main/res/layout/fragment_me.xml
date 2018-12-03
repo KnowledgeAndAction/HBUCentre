@@ -51,26 +51,26 @@
                         android:id="@+id/tv_grade"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="年级：2015级"
+                        android:text="年级：15级"
                         android:textColor="#b9b5b5"
                         android:textSize="12sp" />
 
                     <TextView
-                        android:id="@+id/tv_class"
+                        android:id="@+id/tv_group"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
-                        android:text="班级：软件"
+                        android:text="组别：Android组"
                         android:textColor="#b9b5b5"
                         android:textSize="12sp" />
                 </LinearLayout>
 
                 <TextView
-                    android:id="@+id/tv_group"
+                    android:id="@+id/tv_interest_group"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="组别：Android组"
+                    android:text="兴趣小组：物联网"
                     android:textColor="#b9b5b5"
                     android:textSize="12sp" />
 
@@ -78,151 +78,142 @@
 
         </RelativeLayout>
 
-        <LinearLayout
-            android:id="@+id/ll_add_duty"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/selector_setting_item_bg"
-            android:clickable="true"
-            android:gravity="center"
-            android:padding="16dp">
+            android:layout_height="match_parent">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@mipmap/icon_back_duty" />
-
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:text="添加补班"
-                android:textSize="14sp" />
-        </LinearLayout>
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.7dp"
-            android:background="#e6e3e3" />
+                <LinearLayout
+                    android:id="@+id/ll_add_duty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/selector_setting_item_bg"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:visibility="gone">
 
-        <LinearLayout
-            android:id="@+id/ll_lease"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/selector_setting_item_bg"
-            android:clickable="true"
-            android:gravity="center"
-            android:padding="16dp">
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@mipmap/icon_back_duty" />
 
-            <ImageView
-                android:layout_width="26dp"
-                android:layout_height="26dp"
-                android:src="@mipmap/icon_lease" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:text="添加补班"
+                        android:textSize="14sp" />
+                </LinearLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:text="物品租借"
-                android:textSize="14sp" />
-        </LinearLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.7dp"
+                    android:background="#e6e3e3" />
 
-        <LinearLayout
-            android:id="@+id/ll_look_feedback"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/selector_setting_item_bg"
-            android:clickable="true"
-            android:gravity="center"
-            android:padding="16dp"
-            android:visibility="gone">
+                <LinearLayout
+                    android:id="@+id/ll_lease"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/selector_setting_item_bg"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:padding="16dp">
 
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@mipmap/icon_feed" />
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@mipmap/icon_lease" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:text="查看意见反馈"
-                android:textSize="14sp" />
-        </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:text="物品租借"
+                        android:textSize="14sp" />
+                </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/ll_feedback"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/selector_setting_item_bg"
-            android:clickable="true"
-            android:gravity="center"
-            android:padding="16dp">
+                <LinearLayout
+                    android:id="@+id/ll_feedback"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/selector_setting_item_bg"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:padding="16dp">
 
-            <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@mipmap/icon_feed" />
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@mipmap/icon_feed" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:text="意见反馈"
-                android:textSize="14sp" />
-        </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:text="意见反馈"
+                        android:textSize="14sp" />
+                </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.7dp"
-            android:background="#e6e3e3" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.7dp"
+                    android:background="#e6e3e3" />
 
-        <LinearLayout
-            android:id="@+id/ll_checkToUpdate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/selector_setting_item_bg"
-            android:clickable="true"
-            android:gravity="center"
-            android:padding="16dp">
+                <LinearLayout
+                    android:id="@+id/ll_repair"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/selector_setting_item_bg"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:padding="16dp">
 
-            <ImageView
-                android:layout_width="23dp"
-                android:layout_height="23dp"
-                android:src="@mipmap/icon_repair" />
+                    <ImageView
+                        android:layout_width="23dp"
+                        android:layout_height="23dp"
+                        android:src="@mipmap/icon_repair" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:text="物品报修"
-                android:textSize="14sp" />
-        </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:text="物品报修"
+                        android:textSize="14sp" />
+                </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/ll_esc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/selector_setting_item_bg"
-            android:clickable="true"
-            android:gravity="center"
-            android:padding="16dp">
+                <LinearLayout
+                    android:id="@+id/ll_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/selector_setting_item_bg"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:padding="16dp">
 
-            <ImageView
-                android:layout_width="26dp"
-                android:layout_height="26dp"
-                android:src="@mipmap/icon_setting" />
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@mipmap/icon_setting" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:text="设置"
-                android:textSize="14sp" />
-        </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:text="设置"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
 
     </LinearLayout>
 </ScrollView>

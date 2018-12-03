@@ -42,6 +42,8 @@ public class LookFeedbackActivity extends AppCompatActivity {
         setContentView(R.layout.activity_look_feed_back);
 
         initView();
+
+        initData();
     }
 
     // 从网络获取数据
@@ -78,6 +80,12 @@ public class LookFeedbackActivity extends AppCompatActivity {
                     String phoneBrand = object.getString("phoneBrand");
                     String phoneBrandType = object.getString("phoneBrandType");
                     String androidVersion = object.getString("androidVersion");
+                    String time = object.getString("time");
+                    String name = object.getString("name");
+                    int anonymous = object.getInt("anonymous");
+                    int gradeCode = object.getInt("gradeCode");
+                    int groupCode = object.getInt("groupCode");
+
 
                     FeedBack feedBack = new FeedBack();
                     feedBack.setAccount(account);
@@ -85,6 +93,11 @@ public class LookFeedbackActivity extends AppCompatActivity {
                     feedBack.setPhoneBrand(phoneBrand);
                     feedBack.setPhoneBrandType(phoneBrandType);
                     feedBack.setAndroidVersion(androidVersion);
+                    feedBack.setTime(time);
+                    feedBack.setName(name);
+                    feedBack.setAnonymous(anonymous);
+                    feedBack.setGrade(gradeCode);
+                    feedBack.setGroupCode(groupCode);
 
                     feedbackInfoList.add(feedBack);
                 }
@@ -104,7 +117,7 @@ public class LookFeedbackActivity extends AppCompatActivity {
 
     private void initView() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("查看意见反馈");
+        toolbar.setTitle("查看反馈");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -119,7 +132,7 @@ public class LookFeedbackActivity extends AppCompatActivity {
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        myAdapter = new FeedbackAdapter(feedbackInfoList);
+        myAdapter = new FeedbackAdapter(feedbackInfoList,this);
         recyclerView.setAdapter(myAdapter);
 
         // 配置swipeRefresh
@@ -134,7 +147,5 @@ public class LookFeedbackActivity extends AppCompatActivity {
 
         // 设置开始就刷新
         swipe_refresh.setRefreshing(true);
-
-        initData();
     }
 }

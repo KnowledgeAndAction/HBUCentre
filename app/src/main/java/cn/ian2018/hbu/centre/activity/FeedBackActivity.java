@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -39,6 +40,8 @@ public class FeedBackActivity extends AppCompatActivity {
     private EditText feedbackEdit;
     private Button submitButton;
     private ProgressDialog progressDialog;
+    private CheckBox cb_anonymous;
+    private int isAnonymous = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +76,12 @@ public class FeedBackActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String message = feedbackEdit.getText().toString().trim();
+                // 判断是否匿名
+                if(cb_anonymous.isChecked()){
+                    isAnonymous = 1;
+                } else {
+                    isAnonymous = 0;
+                }
                 if (!TextUtils.isEmpty(message)) {
                     showProgressDialog();
                     // 上传反馈信息
@@ -95,6 +104,7 @@ public class FeedBackActivity extends AppCompatActivity {
                 .addParams("PhoneBrand",phoneInfo.getPhoneBrand())
                 .addParams("PhoneBrandType",phoneInfo.getPhoneBrandType())
                 .addParams("AndroidVersion",phoneInfo.getAndroidVersion())
+                .addParams("Anonymous",isAnonymous+"")
                 .build()
                 .execute(new StringCallback() {
                     @Override
@@ -133,6 +143,8 @@ public class FeedBackActivity extends AppCompatActivity {
         groupText = (TextView) findViewById(R.id.feedback_group_text);
 
         feedbackEdit = (EditText) findViewById(R.id.feedback_edit);
+
+        cb_anonymous = (CheckBox) findViewById(R.id.cb_anonymous);
 
         submitButton = (Button) findViewById(R.id.submit_button);
     }

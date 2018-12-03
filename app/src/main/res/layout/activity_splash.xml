@@ -3,7 +3,7 @@
     android:id="@+id/sl_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_sp">
+    android:background="@drawable/bg_sp2">
 
 
     <cn.ian2018.hbu.centre.view.CircleImageView
@@ -21,28 +21,17 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="30dp"
-        android:text="Copyright © 2016 - 2017 信息技术实验班. All Rights Reserved"
+        android:text="Copyright © 2017 - 2018 大学生软件创新与工程实践平台. All Rights Reserved"
         android:textColor="#ffffff"
-        android:textSize="10sp" />
+        android:textSize="8sp" />
 
     <TextView
-        android:id="@+id/tv_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/tv_end"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
-        android:text="Android组内测版"
-        android:textColor="#ffffff"
-        android:textSize="14sp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/tv_name"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
-        android:text="小蜜蜂"
+        android:layout_marginBottom="30dp"
+        android:text="@string/app_name"
         android:textColor="#ffffff"
         android:textSize="24sp" />
 

@@ -73,7 +73,7 @@ public class ChangePswActivity extends AppCompatActivity {
         });
     }
 
-    // TODO 检查是否修改成功 修改为临时接口
+    // 检查是否修改成功
     private void checkPassWorld(String new_password) {
         showProgressDialogs();
         final String MD5Pass = MD5Util.strToMD5(new_password);

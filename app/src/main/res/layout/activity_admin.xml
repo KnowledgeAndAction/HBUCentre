@@ -29,7 +29,7 @@
     <com.roughike.bottombar.BottomBar
         android:id="@+id/admin_bottomBar"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="@dimen/y84"
         android:layout_gravity="bottom"
         app:bb_tabXmlResource="@xml/admin_bottombar_tabs_color_changing"
         app:bb_behavior="shifting|underNavbar" />

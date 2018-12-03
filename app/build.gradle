@@ -7,8 +7,8 @@ android {
         applicationId "cn.ian2018.hbu.centre"
         minSdkVersion 18
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
@@ -16,6 +16,12 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDir 'libs'
+            jni.srcDirs = []
         }
     }
 }
@@ -29,8 +35,6 @@ dependencies {
     compile files('libs/sensoro-scanner-1.0.1.jar')
     compile files('libs/sensoro-beacon-kit-4.3.jar')
     compile files('libs/android-async-http-1.4.6.jar')
-
-
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.zhy:okhttputils:2.6.2'
@@ -42,8 +46,32 @@ dependencies {
     compile 'com.roughike:bottom-bar:2.3.1'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'q.rorbin:RadarView:1.0.2'
+    compile 'com.github.medyo:fancybuttons:1.8.4'
+    compile 'com.qiniu:qiniu-android-sdk:7.3.+'
+    compile 'com.jph.takephoto:takephoto_library:4.0.3'
+    compile 'com.orhanobut:dialogplus:1.11@aar'
+    compile 'com.skyfishjy.ripplebackground:library:1.0.1'
     testCompile 'junit:junit:4.12'
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

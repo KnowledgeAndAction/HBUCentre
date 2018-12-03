@@ -6,19 +6,21 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -49,16 +51,18 @@ import okhttp3.Call;
 public class LoginActivity extends AppCompatActivity {
     private EditText et_account;
     private EditText et_password;
-    private CheckBox cb_remember;
     private Button bt_login;
-    private static final int USER_ORDINARY = 0;
-    private static final int USER_ADMIN = 1;
+    private static final int USER_ORDINARY = 0; // 组员
+    private static final int USER_ADMIN = 1;    // 管理员
+    private static final int USER_CHAIRMAN = 2; // 主席
+    private static final int USER_LEADER = 3; // 组长
+    private static final int USER_HR = 4; // 人力
+    private static final int USER_REPAIR = 5; // 维修
     private ProgressDialog progressDialog;
     private TextInputLayout text_input_account;
     private TextInputLayout text_input_pass;
     private CustomVideoView videoview;
     private ProgressDialog downloadProgressDialog;
-    private TextView tv_sign_up;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
         initView();
 
         // 设置背景视频
-        //initVideo();
+        initVideo();
 
         // 检查是否已经登录
         checkIsEnter();
@@ -143,7 +147,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void showUpDataDialog(String description, final String appUrl) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         // 设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo2);
+        builder.setIcon(R.mipmap.ic_launcher);
         // 设置不能取消
         builder.setCancelable(false);
         // 设置对话框标题
@@ -177,7 +181,7 @@ public class LoginActivity extends AppCompatActivity {
                 .get()
                 .url(appUrl)
                 .build()
-                .execute(new FileCallBack(getExternalFilesDir("apk").getPath(),"小蜜蜂.apk") {
+                .execute(new FileCallBack(getExternalFilesDir("apk").getPath(),"中心宝.apk") {
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         ToastUtil.show("下载失败："+e.toString());
@@ -205,7 +209,7 @@ public class LoginActivity extends AppCompatActivity {
     // 下载的进度条对话框
     protected void showDownloadProgressDialog() {
         downloadProgressDialog = new ProgressDialog(this);
-        downloadProgressDialog.setIcon(R.mipmap.logo2);
+        downloadProgressDialog.setIcon(R.mipmap.ic_launcher);
         downloadProgressDialog.setTitle("下载安装包中");
         downloadProgressDialog.setCanceledOnTouchOutside(false);
         downloadProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -221,10 +225,20 @@ public class LoginActivity extends AppCompatActivity {
     // 安装应用
     protected void installApk(File file) {
         Intent intent = new Intent("android.intent.action.VIEW");
-        intent.addCategory("android.intent.category.DEFAULT");
-        //文件作为数据源
-        intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        // 判读版本是否在7.0以上
+        if (Build.VERSION.SDK_INT >= 24) {
+            // 参数1 上下文, 参数2 Provider主机地址 和配置文件中保持一致   参数3  共享的文件
+            Uri apkUri = FileProvider.getUriForFile(this, "cn.ian2018.hbu.centre.fileprovider", file);
+            // 添加这一句表示对目标应用临时授权该Uri所代表的文件
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+        } else {
+            intent.addCategory("android.intent.category.DEFAULT");
+            intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+        }
+
         startActivityForResult(intent,1);
         android.os.Process.killProcess(android.os.Process.myPid());
     }
@@ -261,15 +275,24 @@ public class LoginActivity extends AppCompatActivity {
                     et_password.setText(password);
                 }
                 break;
+            // 忘记密码
+            case 3:
+                if (data != null) {
+                    String account = data.getStringExtra("account");
+                    String password = data.getStringExtra("password");
+                    et_account.setText(account);
+                    et_password.setText(password);
+                }
+                break;
         }
     }
 
     // 初始化背景视频
-    /*private void initVideo() {
+    private void initVideo() {
         //加载视频资源控件
         videoview = (CustomVideoView) findViewById(R.id.videoview);
         //设置播放加载路径
-        videoview.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.video3));
+        videoview.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.video));
         //播放
         videoview.start();
         //循环播放
@@ -279,19 +302,19 @@ public class LoginActivity extends AppCompatActivity {
                 videoview.start();
             }
         });
-    }*/
+    }
 
     //返回重启加载
     @Override
     protected void onRestart() {
-        //initVideo();
+        initVideo();
         super.onRestart();
     }
 
     //防止锁屏或者切出的时候，音乐在播放
     @Override
     protected void onStop() {
-        //videoview.stopPlayback();
+        videoview.stopPlayback();
         super.onStop();
     }
 
@@ -299,9 +322,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         // 释放资源
-        /*if (videoview != null) {
+        if (videoview != null) {
             videoview.suspend();
-        }*/
+        }
     }
 
     // 检查权限
@@ -332,7 +355,6 @@ public class LoginActivity extends AppCompatActivity {
                     for (int grantResult : grantResults) {
                         if (grantResult != PackageManager.PERMISSION_GRANTED) {
                             ToastUtil.show("我们需要访问您的位置，来确定活动地点");
-                            return;
                         }
                     }
                 } else {
@@ -369,7 +391,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    // TODO 检查是否登录成功 临时接口
+    // 检查是否登录成功
     private void checkLogin(final String account, String password) {
         // 对密码md5加密
         final String MD5Pass = MD5Util.strToMD5(password);
@@ -390,19 +412,19 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response, int id) {
                         // 解析json数据
-                        getTemporaryJson(response,account,MD5Pass);
+                        getJson(response,account,MD5Pass);
                     }
                 });
     }
 
-    // 解析临时数据
-    private void getTemporaryJson(String response, String account, String password) {
+    // 解析数据
+    private void getJson(String response, String account, String password) {
         try {
             JSONObject jsonObject = new JSONObject(response);
             boolean sucessed = jsonObject.getBoolean("sucessed");
             if (sucessed) {
-                // 检测是否记住密码
-                checkUp(account,password);
+                // 记住密码
+                rememberPassword(account,password);
 
                 // 登录成功
                 JSONObject data = jsonObject.getJSONObject("data");
@@ -411,16 +433,22 @@ public class LoginActivity extends AppCompatActivity {
                 SpUtil.putInt(Constant.USER_GRADE, data.getInt("GradeCode"));
                 SpUtil.putString(Constant.USER_CLASS, data.getString("ClassDescription"));
                 SpUtil.putInt(Constant.USER_GROUP, data.getInt("Group"));
+                SpUtil.putString(Constant.USER_PHONE, data.getString("Phone"));
+                SpUtil.putInt(Constant.USER_INTERESTGROUP, data.getInt("InterestGroupCode"));
                 String imageUrl = data.getString("NewImage");
-                if (!imageUrl.equals("null")) {
-                    SpUtil.putString(Constant.USER_IMAGE, "http://123.206.57.216:8080/StudentImage/" + imageUrl);
+                if (imageUrl.contains("http://")) {
+                    SpUtil.putString(Constant.USER_IMAGE, imageUrl);
                 } else {
-                    imageUrl = data.getString("OldImage");
-                    SpUtil.putString(Constant.USER_IMAGE, "http://123.206.57.216:8080/OldImage/" + imageUrl);
+                    if (!imageUrl.equals("null")) {
+                        SpUtil.putString(Constant.USER_IMAGE, "http://123.206.57.216:8080/StudentImage/" + imageUrl);
+                    } else {
+                        imageUrl = data.getString("OldImage");
+                        SpUtil.putString(Constant.USER_IMAGE, "http://123.206.57.216:8080/OldImage/" + imageUrl);
+                    }
                 }
 
                 // 根据用户类型，跳转到不同页面
-                enterApp(data.getInt("type"));
+                enterApp(data.getInt("Type"));
             } else {
                 // 登录失败
                 closeProgressDialog();
@@ -434,32 +462,31 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    // 进入应用
+    // TODO 进入应用
     private void enterApp(int type) {
-        if (type == USER_ORDINARY) {
+        switch (type) {
             // 跳转到普通用户界面
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-            finish();
-            closeProgressDialog();
-        } else if (type == USER_ADMIN) {
+            case USER_ORDINARY:
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                break;
             // 跳转到管理员用户界面
-            startActivity(new Intent(getApplicationContext(), AdminActivity.class));
-            finish();
-            closeProgressDialog();
+            case USER_ADMIN:
+            case USER_CHAIRMAN:
+            case USER_LEADER:
+            case USER_HR:
+            case USER_REPAIR:
+                startActivity(new Intent(getApplicationContext(), AdminActivity.class));
+                break;
         }
+        finish();
+        closeProgressDialog();
     }
 
-    // 检查是否勾选记住密码
-    private void checkUp(String userName,String mPwd) {
-        if (cb_remember.isChecked()) {
-            SpUtil.putString(Constant.ACCOUNT,userName);
-            SpUtil.putString(Constant.PASS_WORD,mPwd);
-            SpUtil.putBoolean(Constant.IS_REMBER_PWD,true);
-        } else {
-            SpUtil.putString(Constant.ACCOUNT,userName);
-            SpUtil.putString(Constant.PASS_WORD,mPwd);
-            SpUtil.putBoolean(Constant.IS_REMBER_PWD,true);
-        }
+    // 记住密码
+    private void rememberPassword(String userName,String mPwd) {
+        SpUtil.putString(Constant.ACCOUNT,userName);
+        SpUtil.putString(Constant.PASS_WORD,mPwd);
+        SpUtil.putBoolean(Constant.IS_REMBER_PWD,true);
     }
 
     // 检查是否已经登陆
@@ -473,9 +500,9 @@ public class LoginActivity extends AppCompatActivity {
     private void initView() {
         et_account = (EditText) findViewById(R.id.et_account);
         et_password = (EditText) findViewById(R.id.et_password);
-        cb_remember = (CheckBox) findViewById(R.id.cb_remember);
         bt_login = (Button) findViewById(R.id.bt_login);
-        tv_sign_up = (TextView) findViewById(R.id.tv_sign_up);
+        TextView tv_sign_up = (TextView) findViewById(R.id.tv_sign_up);
+        TextView tv_forget = (TextView) findViewById(R.id.tv_forget);
 
         //ImageView iv_bg = (ImageView) findViewById(R.id.iv_bg);
         //Glide.with(this).load(R.drawable.a).asGif().into(iv_bg);
@@ -515,6 +542,14 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+            }
+        });
+
+        // 忘记密码
+        tv_forget.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(LoginActivity.this,ForgetPswActivity.class),3);
             }
         });
 

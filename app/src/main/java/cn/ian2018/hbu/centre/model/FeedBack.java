@@ -10,6 +10,51 @@ public class FeedBack {
     private String PhoneBrand;
     private String PhoneBrandType;
     private String AndroidVersion;
+    private int anonymous; // 是否匿名
+    private String name;    // 姓名
+    private int groupCode;  // 组别
+    private int grade;  // 年级
+    private String time;    // 时间
+
+    public int getAnonymous() {
+        return anonymous;
+    }
+
+    public void setAnonymous(int anonymous) {
+        this.anonymous = anonymous;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getGroupCode() {
+        return groupCode;
+    }
+
+    public void setGroupCode(int groupCode) {
+        this.groupCode = groupCode;
+    }
+
+    public int getGrade() {
+        return grade;
+    }
+
+    public void setGrade(int grade) {
+        this.grade = grade;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
 
     public String getAccount() {
         return account;

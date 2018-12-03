@@ -15,6 +15,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.hicc.information.sensorsignin.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -42,6 +46,11 @@ import okhttp3.Call;
  */
 public class DetailActivity extends AppCompatActivity {
 
+    private static final int TYPE_ORDINARY = 1; // 普通活动
+    private static final int TYPE_DUTY = 2; // 值班
+    private static final int TYPE_TRAINING = 3; // 培训
+    private static final int TYPE_RUN = 4; // 跑步
+    private static final int TYPE_READ = 5; // 晨读
     private Active active;
     private MyBroadcast myBroadcast;
     private String sensor2ID;
@@ -53,17 +62,59 @@ public class DetailActivity extends AppCompatActivity {
     private int clickDebug = 0;
     private ProgressDialog progressDialog;
     private int mNid = -1;
+    private String inLocation = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
+        // 获取位置
+        initLocation();
+
         //初始化数据
         initData();
 
         // 初始化控件
         initView();
+    }
+
+    // 配置百度定位
+    private void initLocation() {
+        // 声明LocationClient类
+        LocationClient mLocationClient = new LocationClient(getApplicationContext());
+        // 注册监听函数
+        mLocationClient.registerLocationListener(new BDAbstractLocationListener() {
+            @Override
+            public void onReceiveLocation(BDLocation bdLocation) {
+                String addr = bdLocation.getAddrStr();    //获取详细地址信息
+                String locationDescribe = bdLocation.getLocationDescribe();    //获取位置描述信息
+
+                inLocation = addr + locationDescribe;
+            }
+        });
+
+        // 配置定位信息
+        LocationClientOption option = new LocationClientOption();
+        //设置定位模式，默认高精度
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+        //设置返回经纬度坐标类型，默认gcj02  bd09ll：百度经纬度坐标；
+        option.setCoorType("bd09ll");
+        //设置发起定位请求的间隔，int类型，单位ms
+        option.setScanSpan(60*1000*60);
+        //设置是否使用gps，默认false
+        option.setOpenGps(true);
+        //设置是否在stop的时候杀死这个进程，默认（建议）不杀死，即setIgnoreKillProcess(true)
+        option.setIgnoreKillProcess(false);
+        //是否需要地址信息，默认为不需要，即参数为false
+        option.setIsNeedAddress(true);
+        //是否需要位置描述信息，默认为不需要，即参数为false
+        option.setIsNeedLocationDescribe(true);
+        //需将配置好的LocationClientOption对象，通过setLocOption方法传递给LocationClient对象使用
+        mLocationClient.setLocOption(option);
+
+        // 开始定位
+        mLocationClient.start();
     }
 
     // 初始化控件
@@ -93,12 +144,18 @@ public class DetailActivity extends AppCompatActivity {
 
         activityLocation.setText("地点：" + active.getActiveLocation());
         activityDes.setText("    " + active.getActiveDes());
-        if(active.getRule() == 3){
-            tv_time.setText("开始时间：" + active.getActiveTime().replace("T", " ").substring(11, 16));
-            tv_end_time.setText("结束时间：" + active.getEndTime().replace("T", " ").substring(11, 16));
-        } else {
-            tv_time.setText("开始时间：" + active.getActiveTime().replace("T", " ").substring(0, 16));
-            tv_end_time.setText("结束时间：" + active.getEndTime().replace("T", " ").substring(0, 16));
+        switch (active.getRule()) {
+            case TYPE_ORDINARY:
+            case TYPE_TRAINING:
+                tv_time.setText("开始时间：" + active.getActiveTime().replace("T", " ").substring(0, 16));
+                tv_end_time.setText("结束时间：" + active.getEndTime().replace("T", " ").substring(0, 16));
+                break;
+            case TYPE_DUTY:
+            case TYPE_READ:
+            case TYPE_RUN:
+                tv_time.setText("开始时间：" + active.getActiveTime().replace("T", " ").substring(11, 16));
+                tv_end_time.setText("结束时间：" + active.getEndTime().replace("T", " ").substring(11, 16));
+                break;
         }
 
         // 签到按钮点击事件
@@ -115,13 +172,15 @@ public class DetailActivity extends AppCompatActivity {
     private void signIn() {
         switch (active.getRule()) {
             // 日常活动
-            case 1:
-            case 3:
+            case TYPE_DUTY:
+            case TYPE_RUN:
+            case TYPE_READ:
                 // 如果当前签到时间距离上一次签到时间不超过24个小时，就不能再次签到
                 if (database.isRecentSign(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId()) || clickDebug > 24) {
                     if (TimeCompareDay(active.getActiveTime().replace("T", " ").substring(11, 19))) {
                         // TODO 如果能检测到云子 可以签到 为了优化用户体验，当连续点击15次，可以签到
-                        if (isCan || clickCount > 14) {
+                        // 如果是扫描获取的活动，可以直接签到
+                        if (isCan || clickCount > 14 || active.isScan()) {
                             signInForService();
                         } else {
                             ToastUtil.show("暂时无法进行签到，请稍后重试，并确保您在活动地点附近");
@@ -138,7 +197,8 @@ public class DetailActivity extends AppCompatActivity {
                 }
                 break;
             // 普通活动
-            case 2:
+            case TYPE_ORDINARY:
+            case TYPE_TRAINING:
                 int flag = database.isSign2(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId());
                 switch (flag) {
                     // 如果还没有签到过
@@ -146,7 +206,7 @@ public class DetailActivity extends AppCompatActivity {
                         // 如果符合时间
                         if (TimeCompare(active.getActiveTime().replace("T", " ").substring(0, 19))) {
                             // 如果能检测到云子 可以签到
-                            if (isCan || clickCount > 14) {
+                            if (isCan || clickCount > 14 || active.isScan()) {
                                 signInForService();
                             } else {
                                 ToastUtil.show("暂时无法进行签到，请稍后重试，并确保您在活动地点附近");
@@ -182,6 +242,7 @@ public class DetailActivity extends AppCompatActivity {
                 .addParams("activityid", active.getActiveId() + "")
                 .addParams("intime", inTime)
                 .addParams("outtime", inTime)
+                .addParams("InLocation", inLocation)
                 .build()
                 .execute(new StringCallback() {
                     @Override
@@ -327,7 +388,7 @@ public class DetailActivity extends AppCompatActivity {
     private void showSignConfirmDialog() {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         //设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo2);
+        builder.setIcon(R.mipmap.ic_launcher);
         //设置对话框标题
         builder.setTitle("确定要签到");
         //设置文本内容
